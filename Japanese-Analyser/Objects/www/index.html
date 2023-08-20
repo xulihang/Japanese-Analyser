@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Japanese Analyser</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+</head>
+<body>
+	<div>
+		<div class="parseResults">
+
+		</div>
+	</div>
+	<script>
+		window.onload = function(){
+			console.log("loaded");
+      analyse();
+		}
+
+		function analyse(){
+      let source = getUrlParam("source");
+      if (!source) {
+        return;
+      }
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', "/analyse?text="+source);
+      xhr.onreadystatechange = function(){
+        if(xhr.readyState === 4){
+          displayResults(xhr.responseText);
+        }
+      }
+      xhr.onerror = function(){
+        console.log("error");
+      }
+      xhr.send();
+    }
+
+		function displayResults(json){
+			let parseResults = "";
+      let tokens = JSON.parse(json);
+			for (let index = 0; index < tokens.length; index++) {
+				const token = tokens[index];
+				parseResults = parseResults + token["Surface"] + "	" + token["AllFeatures"];
+				if (index != tokens.length - 1) {
+					parseResults = parseResults + "\n";
+				}
+			}
+			document.getElementsByClassName("parseResults")[0].innerText = parseResults;
+		}
+
+		function getUrlParam(name) {
+			name = name.replace(/[]/,"\[").replace(/[]/,"\[").replace(/[]/,"\\\]");
+			var regexS = "[\\?&]"+name+"=([^&#]*)";
+			var regex = new RegExp( regexS );
+			var results = regex.exec(window.parent.location.href);
+			if( results == null ) 
+					return ""; 
+			else {
+					return results[1];
+			}
+    };
+	</script>
+</body>
+</html>
